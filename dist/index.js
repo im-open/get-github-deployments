@@ -46416,10 +46416,10 @@ var require_deployments = __commonJS({
         environment: context.environment,
         per_page: 100
       };
-      const deploymentsList = (
+      const restDeployments = (
         await octokit.paginate(octokit.rest.repos.listDeployments, params)
       ).filter(d => d.payload.entity == context.entity && d.payload.instance == context.instance);
-      const deploymentNodeIds = deploymentsList.map(d => d.node_id);
+      const deploymentNodeIds = restDeployments.map(d => d.node_id);
       const statusesQuery = `
       query($deploymentNodeIds: [ID!]!) {
         deployments: nodes(ids: $deploymentNodeIds) {
@@ -46441,18 +46441,22 @@ var require_deployments = __commonJS({
           }
         }
       }`;
-      const deployments = await octokitGraphQl(statusesQuery, { deploymentNodeIds });
+      const qlDeployments = await octokitGraphQl(statusesQuery, {
+        deploymentNodeIds
+      });
       const returnData = [];
-      for (let i in deployments) {
-        const deployment = deployments[i];
-        const deploymentNode = deploymentsList.filter(d => d.node_id == deployment.id)[0];
-        const env = deployment.environment;
+      console.log('QL Deployments: ', qlDeployments);
+      for (let i = 0; i < qlDeployments.deployments.length; i++) {
+        const qlDeployment = qlDeployments.deployments[i];
+        const restDeployment = restDeployments.filter(d => d.node_id == qlDeployment.id)[0];
+        const env = qlDeployment.environment;
+        console.log('Deployment: ', qlDeployment);
         returnData.push({
-          ref: deployment.ref.name,
-          status: deployment.statuses.nodes[0].state,
-          description: deployment.statuses.nodes[0].description,
-          workflow_actor: deploymentNode.payload.workflow_actor,
-          created_at: DateTime.fromISO(deployment.statuses.nodes[0].createdAt).toISO()
+          ref: qlDeployment.ref.name,
+          status: qlDeployment.statuses.nodes[0].state,
+          description: qlDeployment.statuses.nodes[0].description,
+          workflow_actor: restDeployment.payload.workflow_actor,
+          created_at: DateTime.fromISO(qlDeployment.statuses.nodes[0].createdAt).toISO()
         });
       }
       return returnData;
