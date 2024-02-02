@@ -51,7 +51,7 @@ async function listDeployments(context) {
 
   for (let i in deployments) {
     const deployment = deployments[i];
-    const deploymentNode = deploymentsList.find(d => d.node_id == deployment.id)[0];
+    const deploymentNode = deploymentsList.filter(d => d.node_id == deploymentQl.id)[0];
     const env = deployment.environment;
 
     returnData.push({
