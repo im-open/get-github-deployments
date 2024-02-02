@@ -5,7 +5,9 @@ This action gets a list of GitHub deployments and statuses created by [im-open/c
 ## Index <!-- omit in toc -->
 
 - [Inputs](#inputs)
+- [Outputs](#outputs)
 - [Usage Example](#usage-example)
+  - [Return Example](#return-example)
 - [Contributing](#contributing)
   - [Incrementing the Version](#incrementing-the-version)
   - [Source Code Changes](#source-code-changes)
@@ -18,18 +20,23 @@ When the action runs it will add a deployment and deployment status record to th
 
 ## Inputs
 
-| Parameter        | Is Required | Description                                                                                                                                                                                         |
-| ---------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workflow-actor` | true        | The GitHub user who triggered the workflow                                                                                                                                                          |
-| `token`          | true        | A token with `repo_deployment` permissions to create and update issues, workflows using this action should be granted `permissions` of `deployments: write`                                         |
-| `environment`    | true        | The environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]                                                                                                                 |
-| `entity`         | true        | The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"                                                                                                                    |
-| `instance`       | true        | A freeform identifier to distinguish separately deployed instances of the entity in the same environment. Typical uses would be to name a slot and/or region, e.g "NA26", "NA26-slot1", "NA27-blue" |
+| Parameter     | Is Required | Description                                                                                                                                                                                                                       |
+| ------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `token`       | true        | A token with `repo_deployment` permissions to create and update issues, workflows using this action should be granted `permissions` of `deployments: write`                                                                       |
+| `environment` | true        | The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It will be set in the standard `environment` property of the deployment object.                                             |
+| `entity`      | true        | The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"                                                                                                                                                  |
+| `instance`    | true        | A freeform identifier to distinguish separately deployed instances of the entity in the same environment. Typical uses would be to name a slot and/or region, e.g "NA26", "NA26-slot1", "NA27-blue", "Primary", "Secondary", etc. |
+
+## Outputs
+
+| Value       | Description                                           |
+| ----------- | ----------------------------------------------------- |
+| deployments | A list of deployments by `environment` and `instance` |
 
 ## Usage Example
 
 ```yaml
-name: Take Down Testing
+name: Get Environment Instance Deployments
 on:
   workflow_dispatch:
     environment:
@@ -50,9 +57,9 @@ on:
           - Secondary-Test-Slot1
           - Secondary-Test-Slot2
 
-# Permissions needed to add GitHub Deployment and Deployment
-# status objects
+# Permissions needed to get GitHub deployments &  status objects
 permissions:
+  contents: read
   deployments: write
 
 jobs:
@@ -61,22 +68,53 @@ jobs:
     runs-on: [ubuntu-20.04]
 
     steps:
-      ...
-      # Environment cleanup steps
-      ...
-
-      inactivate-deployment:
+      get-deployments:
         runs-on: ubuntu-latest
         steps:
-          - name: Inactivate deployments
-            id: inactivate-deployment
-            uses: im-open/inactivate-github-deployment@v1.0.0
+          - name: Get Deployments
+            id: get-deployments
+            uses: im-open/get-github-deployments@v1.0.0
             with:
-              workflow-actor: ${{ github.actor }}
               token: ${{ secrets.GITHUB_TOKEN }}
               environment: ${{ github.event.inputs.environment }}
-              entity: inactivate-github-deployment
+              entity: get-github-deployments
               instance: ${{ github.event.inputs.instance }}
+
+          - name: Display Deployments
+            id: display-deployments
+            run: echo "${{ steps.get-deployments.outputs.deployments }}"
+      ...
+```
+
+*_Make sure your workflow has the `permissions.contents` and `permissions.deployments` set to `read`._*
+
+### Return Example
+
+```json
+[
+    {
+        "ref": "v1.2.1",
+        "status": "SUCCESS",
+        "description": "It worked!",
+        "workflow_actor": "gh-user",
+        "created_at": "2024-01-31T17:21:08.000+00:00"
+    },
+    {
+        "ref": "v1.2.3",
+        "status": "INACTIVE",
+        "description": "Inactivated by workflow",
+        "workflow_actor": "gh-user",
+        "created_at": "2024-01-31T17:21:08.000+00:00"
+    },
+    {
+        "ref": "v1.2.2",
+        "status": "INACTIVE",
+        "description": "Inactivated by workflow",
+        "workflow_actor": "gh-user",
+        "created_at": "2024-01-30T23:26:19.000+00:00"
+    },
+    ...
+]
 ```
 
 ## Contributing
