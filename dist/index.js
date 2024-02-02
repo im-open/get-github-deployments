@@ -46445,7 +46445,7 @@ var require_deployments = __commonJS({
       const returnData = [];
       for (let i in deployments) {
         const deployment = deployments[i];
-        const deploymentNode = deploymentsList.filter(d => d.node_id == deploymentQl.id)[0];
+        const deploymentNode = deploymentsList.filter(d => d.node_id == deployment.id)[0];
         const env = deployment.environment;
         returnData.push({
           ref: deployment.ref.name,
