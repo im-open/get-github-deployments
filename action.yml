@@ -1,16 +1,20 @@
-name: 'JavaScript Action Template'
-
-description: 'Add description here'
+name: Get GitHub Deployments
+description: Get GitHub a list of deployments that have been created by im-open/create-github-deployment.
 
 inputs:
-  input-1:
-    description: 'Add a description here'
+  token:
+    description: 'A token with `repo_deployment` permissions to create and update issues, workflows using this action should be granted `permissions` of `deployments: write`'
+    required: true
+  environment:
+    description: The name of a GitHub environment the release was deployed to, i.e. [Dev|QA|Stage|Demo|UAT|Prod]. It will be set in the standard `environment` property of the deployment object.
+    required: true
+  entity:
+    description: The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"
+    required: true
+  instance:
+    description: A freeform identifier to distinguish separately deployed instances of the entity in the same environment. Typical uses would be to name a slot and/or region, e.g "NA26", "NA26-slot1", "NA27-blue", "Primary", "Secondary", etc.
     required: true
 
-outputs:
-  output-1:
-    description: 'Add a description here'
-
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: node20
+  main: dist/index.js
