@@ -21,8 +21,8 @@ try {
 
     if (deployments.length == 0) {
       console.log('No deployments found');
-      return;
     } else {
+      console.log('Deployments Count:', deployments.length);
       core.setOutput('deployments', JSON.stringify(deployments));
     }
   });

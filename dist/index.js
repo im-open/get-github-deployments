@@ -46445,12 +46445,10 @@ var require_deployments = __commonJS({
         deploymentNodeIds
       });
       const returnData = [];
-      console.log('QL Deployments: ', qlDeployments);
       for (let i = 0; i < qlDeployments.deployments.length; i++) {
         const qlDeployment = qlDeployments.deployments[i];
         const restDeployment = restDeployments.filter(d => d.node_id == qlDeployment.id)[0];
         const env = qlDeployment.environment;
-        console.log('Deployment: ', qlDeployment);
         returnData.push({
           ref: qlDeployment.ref.name,
           status: qlDeployment.statuses.nodes[0].state,
@@ -46484,8 +46482,8 @@ try {
     console.log('Get Deployments:', setupContext);
     if (deployments.length == 0) {
       console.log('No deployments found');
-      return;
     } else {
+      console.log('Deployments Count:', deployments.length);
       core.setOutput('deployments', JSON.stringify(deployments));
     }
   });
