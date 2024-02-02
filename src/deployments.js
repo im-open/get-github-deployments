@@ -61,7 +61,7 @@ async function listDeployments(context) {
       status: qlDeployment.statuses.nodes[0].state,
       description: qlDeployment.statuses.nodes[0].description,
       workflow_actor: restDeployment.payload.workflow_actor,
-      created_at: DateTime.fromISO(qlDeployment.statuses.nodes[0].createdAt).toISO()
+      created_at: DateTime.fromISO(qlDeployment.statuses.nodes[0].createdAt)
     });
   }
 
