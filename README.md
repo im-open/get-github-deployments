@@ -16,14 +16,13 @@ This action gets a list of GitHub deployments and statuses created by [im-open/c
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
-When the action runs it will add a deployment and deployment status record to the repo.  The GitHub Deployment will also have a special task d
 
 ## Inputs
 
 | Parameter     | Is Required | Description                                                                                                                                                                                                                       |
 | ------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `token`       | true        | A token with `repo_deployment` permissions to create and update issues, workflows using this action should be granted `permissions` of `deployments: write`                                                                       |
-| `environment` | true        | The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It will be set in the standard `environment` property of the deployment object.                                             |
+| `token`       | true        | A token with `deployments:read` and `contents:read` to get the deployments and release reference data.                                                                                                                            |
+| `environment` | true        | The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It ill be used to filter deployment objects.                                                                                |
 | `entity`      | true        | The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"                                                                                                                                                  |
 | `instance`    | true        | A freeform identifier to distinguish separately deployed instances of the entity in the same environment. Typical uses would be to name a slot and/or region, e.g "NA26", "NA26-slot1", "NA27-blue", "Primary", "Secondary", etc. |
 
@@ -59,8 +58,8 @@ on:
 
 # Permissions needed to get GitHub deployments &  status objects
 permissions:
+  deployments: read
   contents: read
-  deployments: write
 
 jobs:
   environment: ${{ github.event.inputs.environment }}

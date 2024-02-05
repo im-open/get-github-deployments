@@ -3,10 +3,10 @@ description: Get GitHub a list of deployments that have been created by im-open/
 
 inputs:
   token:
-    description: 'A token with `repo_deployment` permissions to create and update issues, workflows using this action should be granted `permissions` of `deployments: write`'
+    description: A token with `deployments:read` and `contents:read` to get the deployments and release reference data.
     required: true
   environment:
-    description: The name of a GitHub environment the release was deployed to, i.e. [Dev|QA|Stage|Demo|UAT|Prod]. It will be set in the standard `environment` property of the deployment object.
+    description: The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It ill be used to filter deployment objects.
     required: true
   entity:
     description: The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"
