@@ -6,7 +6,7 @@ inputs:
     description: A token with `deployments:read` and `contents:read` to get the deployments and release reference data.
     required: true
   environment:
-    description: The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It ill be used to filter deployment objects.
+    description: The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It will be used to filter deployment objects.
     required: true
   entity:
     description: The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"
