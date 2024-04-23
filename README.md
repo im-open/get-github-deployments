@@ -72,7 +72,7 @@ jobs:
         steps:
           - name: Get Deployments
             id: get-deployments
-            uses: im-open/get-github-deployments@v1.0.0
+            uses: im-open/get-github-deployments@v1.0.1
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               environment: ${{ github.event.inputs.environment }}
