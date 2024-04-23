@@ -57,7 +57,7 @@ async function listDeployments(context) {
     const env = qlDeployment.environment;
 
     returnData.push({
-      ref: qlDeployment.ref.name,
+      ref: qlDeployment.ref?.name || 'N/A',
       status: qlDeployment.statuses.nodes[0].state,
       description: qlDeployment.statuses.nodes[0].description,
       workflow_actor: restDeployment.payload.workflow_actor,

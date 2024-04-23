@@ -46450,7 +46450,7 @@ var require_deployments = __commonJS({
         const restDeployment = restDeployments.filter(d => d.node_id == qlDeployment.id)[0];
         const env = qlDeployment.environment;
         returnData.push({
-          ref: qlDeployment.ref.name,
+          ref: qlDeployment.ref?.name || 'N/A',
           status: qlDeployment.statuses.nodes[0].state,
           description: qlDeployment.statuses.nodes[0].description,
           workflow_actor: restDeployment.payload.workflow_actor,
