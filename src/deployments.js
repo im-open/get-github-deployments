@@ -21,7 +21,11 @@ async function listDeployments(context) {
 
   const restDeployments = (
     await octokit.paginate(octokit.rest.repos.listDeployments, params)
-  ).filter(d => d.payload.entity == context.entity && d.payload.instance == context.instance);
+  ).filter(
+    d =>
+      d.payload.entity.toString().toLowerCase() == context.entity.toString().toLowerCase() &&
+      d.payload.instance.toString().toLowerCase() == context.instance.toString().toLowerCase()
+  );
 
   const deploymentNodeIds = restDeployments.map(d => d.node_id);
   const statusesQuery = `

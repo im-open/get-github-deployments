@@ -23,8 +23,10 @@ This action gets a list of GitHub deployments and statuses created by [im-open/c
 | ------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `token`       | true        | A token with `deployments:read` and `contents:read` to get the deployments and release reference data.                                                                                                                            |
 | `environment` | true        | The name of a GitHub environment the release was deployed to, i.e. [Dev\|QA\|Stage\|Demo\|UAT\|Prod]. It will be used to filter deployment objects.                                                                               |
-| `entity`      | true        | The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db"                                                                                                                                                  |
+| `entity`      | true        | The entity that is deployed, i.e. "proj-app", "proj-infrastruction" or "proj-db".                                                                                                                                                 |
 | `instance`    | true        | A freeform identifier to distinguish separately deployed instances of the entity in the same environment. Typical uses would be to name a slot and/or region, e.g "NA26", "NA26-slot1", "NA27-blue", "Primary", "Secondary", etc. |
+
+**`environment`, `entity`, and `instance` values will be searched in a case-insensitive manner.**
 
 ## Outputs
 
@@ -72,7 +74,7 @@ jobs:
         steps:
           - name: Get Deployments
             id: get-deployments
-            uses: im-open/get-github-deployments@v1.0.1
+            uses: im-open/get-github-deployments@v1.0.2
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               environment: ${{ github.event.inputs.environment }}
