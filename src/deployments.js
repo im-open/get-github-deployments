@@ -23,7 +23,7 @@ async function listDeployments(context) {
     await octokit.paginate(octokit.rest.repos.listDeployments, params)
   ).filter(
     d =>
-      d.payload.entity == context.entity &&
+      d.payload.entity.toString().toLowerCase() == context.entity.toString().toLowerCase() &&
       d.payload.instance.toString().toLowerCase() == context.instance.toString().toLowerCase()
   );
 
