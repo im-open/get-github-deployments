@@ -27,7 +27,13 @@ async function listDeployments(context) {
       d.payload.instance.toString().toLowerCase() == context.instance.toString().toLowerCase()
   );
 
-  const deploymentNodeIds = restDeployments.map(d => d.node_id);
+  // Sort by created_at descending (newest first), then take the first 100
+  // To prevent the issue: You may not provide more than 100 node ids; you provided 126.
+  const latest100Deployments = restDeployments
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 100);
+
+  const deploymentNodeIds = latest100Deployments.map(d => d.node_id);
   const statusesQuery = `
       query($deploymentNodeIds: [ID!]!) {
         deployments: nodes(ids: $deploymentNodeIds) {
