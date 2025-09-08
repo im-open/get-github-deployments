@@ -46423,8 +46423,11 @@ var require_deployments = __commonJS({
           d.payload.entity.toString().toLowerCase() == context.entity.toString().toLowerCase() &&
           d.payload.instance.toString().toLowerCase() == context.instance.toString().toLowerCase()
       );
-      const deploymentNodeIds = restDeployments.map(d => d.node_id);
-      const statusesQuery = `
+      const returnData = [];
+      for (let i = 0; i < restDeployments.length; i += 100) {
+        const chunk = restDeployments.slice(i, i + 100);
+        const deploymentNodeIds = chunk.map(d => d.node_id);
+        const statusesQuery = `
       query($deploymentNodeIds: [ID!]!) {
         deployments: nodes(ids: $deploymentNodeIds) {
           ... on Deployment {
@@ -46434,8 +46437,7 @@ var require_deployments = __commonJS({
             ref {
               name
             }
-            # We only need the most recent status
-            statuses(first:1) {
+            statuses(first: 1) {
               nodes {
                 description
                 state
@@ -46445,21 +46447,20 @@ var require_deployments = __commonJS({
           }
         }
       }`;
-      const qlDeployments = await octokitGraphQl(statusesQuery, {
-        deploymentNodeIds
-      });
-      const returnData = [];
-      for (let i = 0; i < qlDeployments.deployments.length; i++) {
-        const qlDeployment = qlDeployments.deployments[i];
-        const restDeployment = restDeployments.filter(d => d.node_id == qlDeployment.id)[0];
-        const env = qlDeployment.environment;
-        returnData.push({
-          ref: qlDeployment.ref?.name || 'N/A',
-          status: qlDeployment.statuses.nodes[0].state,
-          description: qlDeployment.statuses.nodes[0].description,
-          workflow_actor: restDeployment.payload.workflow_actor,
-          created_at: DateTime.fromISO(qlDeployment.statuses.nodes[0].createdAt)
+        const qlDeployments = await octokitGraphQl(statusesQuery, {
+          deploymentNodeIds
         });
+        for (const qlDeployment of qlDeployments.deployments) {
+          const restDeployment = chunk.find(d => d.node_id === qlDeployment.id);
+          if (!restDeployment || !qlDeployment.statuses.nodes.length) continue;
+          returnData.push({
+            ref: qlDeployment.ref?.name || 'N/A',
+            status: qlDeployment.statuses.nodes[0].state,
+            description: qlDeployment.statuses.nodes[0].description,
+            workflow_actor: restDeployment.payload.workflow_actor,
+            created_at: DateTime.fromISO(qlDeployment.statuses.nodes[0].createdAt)
+          });
+        }
       }
       return returnData;
     }
