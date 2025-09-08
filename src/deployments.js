@@ -64,7 +64,7 @@ async function listDeployments(context) {
   for (let i = 0; i < qlDeployments.deployments.length; i++) {
     const qlDeployment = qlDeployments.deployments[i];
     const restDeployment = restDeployments.filter(d => d.node_id == qlDeployment.id)[0];
-    const env = qlDeployment.environment;
+    if (typeof restDeployment === 'undefined') continue;
 
     returnData.push({
       ref: qlDeployment.ref?.name || 'N/A',

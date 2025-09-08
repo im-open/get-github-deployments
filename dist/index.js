@@ -46423,7 +46423,10 @@ var require_deployments = __commonJS({
           d.payload.entity.toString().toLowerCase() == context.entity.toString().toLowerCase() &&
           d.payload.instance.toString().toLowerCase() == context.instance.toString().toLowerCase()
       );
-      const deploymentNodeIds = restDeployments.map(d => d.node_id);
+      const latest100Deployments = restDeployments
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 100);
+      const deploymentNodeIds = latest100Deployments.map(d => d.node_id);
       const statusesQuery = `
       query($deploymentNodeIds: [ID!]!) {
         deployments: nodes(ids: $deploymentNodeIds) {
@@ -46452,7 +46455,7 @@ var require_deployments = __commonJS({
       for (let i = 0; i < qlDeployments.deployments.length; i++) {
         const qlDeployment = qlDeployments.deployments[i];
         const restDeployment = restDeployments.filter(d => d.node_id == qlDeployment.id)[0];
-        const env = qlDeployment.environment;
+        if (typeof restDeployment === 'undefined') continue;
         returnData.push({
           ref: qlDeployment.ref?.name || 'N/A',
           status: qlDeployment.statuses.nodes[0].state,
